@@ -1,0 +1,641 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إمبراطورية ملوكتي ❤️ | حكاية حبنا</title>
+    <!-- Google Fonts Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        roseGold: '#b76e79',
+                        softPink: '#ffccd5',
+                        deepPink: '#ff4d6d',
+                        romanticRed: '#c9184a',
+                        lavenderBg: '#fdf2f4',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                        'heartbeat': 'heartbeat 1.2s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        heartbeat: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '15%': { transform: 'scale(1.2)' },
+                            '30%': { transform: 'scale(1)' },
+                            '45%': { transform: 'scale(1.15)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #120408;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 182, 193, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(201, 24, 74, 0.2);
+        }
+
+        .glass-modal {
+            background: rgba(20, 5, 10, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a080e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff4d6d;
+            border-radius: 4px;
+        }
+
+        /* Floating Hearts Background Animation */
+        .floating-heart {
+            position: absolute;
+            color: rgba(255, 105, 180, 0.4);
+            animation: floatUp linear infinite;
+            z-index: 1;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.4) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Shaking animation for incorrect password */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Background Parallax & Glow */
+        .bg-parallax {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('img1.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(12px) brightness(0.35);
+            transform: scale(1.1);
+            z-index: -2;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(18, 4, 8, 0.85) 0%, rgba(50, 10, 25, 0.8) 100%);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen selection:bg-deepPink selection:text-white">
+
+    <!-- Background Image & Overlay -->
+    <div class="bg-parallax"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- Floating Hearts Container -->
+    <div id="hearts-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- Audio Element -->
+    <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+
+    <!-- ================= PASSWORD MODAL ================= -->
+    <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-700">
+        <div class="glass-modal max-w-md w-full p-8 rounded-3xl text-center shadow-2xl relative overflow-hidden border border-pink-500/30">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-pink-500/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div>
+
+            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-tr from-romanticRed to-deepPink rounded-full flex items-center justify-center shadow-lg shadow-deepPink/50 animate-heartbeat">
+                <i class="fa-solid fa-heart-pulse text-3xl text-white"></i>
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-2">مرحباً يا ملكة قلبي ❤️</h2>
+            <p class="text-pink-200/90 text-sm md:text-base mb-6 leading-relaxed">
+                اكتبي تاريخ أول مرة كلمنا بعض يا ملوكتي عشان ندخل عالمنا الخاص ✨<br>
+                <span class="text-xs text-pink-300/70">(مثال: 5/10/2026)</span>
+            </p>
+
+            <div class="relative mb-4">
+                <input type="text" id="passwordInput" placeholder="اكتبي التاريخ هنا..." 
+                    class="w-full px-5 py-4 rounded-2xl bg-white/10 border border-pink-400/40 text-white placeholder-pink-300/50 text-center text-lg focus:outline-none focus:ring-2 focus:ring-deepPink focus:border-transparent transition-all shadow-inner">
+                <div class="absolute left-4 top-4 text-pink-400">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+            </div>
+
+            <div id="errorMsg" class="text-red-400 text-sm mb-4 h-6 font-medium transition-all duration-300 opacity-0"></div>
+
+            <button onclick="checkPassword()" 
+                class="w-full py-4 rounded-2xl bg-gradient-to-r from-deepPink via-romanticRed to-pink-600 text-white font-bold text-lg shadow-lg shadow-deepPink/40 hover:shadow-deepPink/70 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3">
+                <span>افتحي باب قلبك 💖</span>
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP CONTENT ================= -->
+    <div id="mainApp" class="opacity-0 pointer-events-none transition-opacity duration-1000 relative z-10 flex flex-col min-h-screen">
+
+        <!-- Floating Music Player Widget -->
+        <div class="fixed top-5 left-5 z-40 glass-card px-4 py-2.5 rounded-full flex items-center gap-3 shadow-xl border border-pink-500/30">
+            <button id="musicToggleBtn" onclick="toggleMusic()" class="w-10 h-10 rounded-full bg-deepPink text-white flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+                <i id="musicIcon" class="fa-solid fa-music animate-spin-slow"></i>
+            </button>
+            <div class="hidden sm:block text-xs">
+                <p class="text-pink-200 font-bold">موسيقى حبنا 🎶</p>
+                <p class="text-pink-400/80 text-[10px]">ملوكتي ومزيكا الذكريات</p>
+            </div>
+        </div>
+
+        <!-- HERO SECTION -->
+        <header class="min-h-screen flex flex-col items-center justify-center text-center px-4 relative pt-20 pb-12">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#120408]/60 to-[#120408] pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+                <!-- Glowing Profile Photo / Hero Image -->
+                <div class="w-36 h-36 md:w-48 md:h-48 rounded-full p-1.5 bg-gradient-to-tr from-deepPink via-roseGold to-pink-300 shadow-2xl shadow-deepPink/50 mb-8 animate-float">
+                    <img src="img1.jpg" alt="ملوكتي الجميلة" onerror="this.src='https://placehold.co/400x400/ff4d6d/ffffff?text=Malokti'" class="w-full h-full object-cover rounded-full border-4 border-[#120408]">
+                </div>
+
+                <div class="inline-block px-4 py-1.5 rounded-full bg-deepPink/20 border border-pink-500/40 text-pink-300 text-sm font-semibold mb-4 backdrop-blur-md">
+                    ✨ لملكة روحي وعمري كله ✨
+                </div>
+
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 tracking-tight drop-shadow-md">
+                    أهلاً بملكة قلبي <br><span class="bg-gradient-to-r from-pink-300 via-deepPink to-roseGold bg-clip-text text-transparent">ملوكتي ❤️</span>
+                </h1>
+
+                <p id="typingText" class="text-lg md:text-xl text-pink-100/90 max-w-2xl mb-10 leading-relaxed font-medium">
+                    يا أحلى حاجة حصلت في عمري كله.. الموقع ده معمول عشان أقولك قد إبح بحبك وقد إيه وجودك منور دنيتي ومخلي لحياتي طعم تاني خالص يا روح قلبي.
+                </p>
+
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <a href="#gallery" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-deepPink to-romanticRed text-white font-bold shadow-lg shadow-deepPink/40 hover:scale-105 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-images"></i>
+                        <span>شوفي صورك الساحرة</span>
+                    </a>
+                    <a href="#minigame" class="px-8 py-4 rounded-2xl glass-card text-pink-200 font-bold hover:bg-white/20 transition-all flex items-center gap-2 border border-pink-400/40">
+                        <i class="fa-solid fa-heart"></i>
+                        <span>لعبة قلوبنا</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce text-pink-400 z-10">
+                <i class="fa-solid fa-chevron-down text-2xl"></i>
+            </div>
+        </header>
+
+        <!-- INTERACTIVE PHOTO GALLERY (5 PHOTOS) -->
+        <section id="gallery" class="py-20 px-4 max-w-7xl mx-auto w-full relative z-10">
+            <div class="text-center mb-16">
+                <div class="inline-block px-4 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 text-sm mb-3">
+                    معرض ذكرياتنا وجمالك
+                </div>
+                <h2 class="text-3xl md:text-5xl font-black text-white mb-4">
+                    5 صور تحكي <span class="text-deepPink">قصة عشقنا</span> ✨
+                </h2>
+                <p class="text-pink-200/80 max-w-xl mx-auto">
+                    كل صورة ليكي ليها حكاية في قلبي، وكل ضحكة منك بتنور عتمة أيامي يا أجمل ملكة في الكون.
+                </p>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Photo 1 -->
+                <div class="glass-card rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-500 shadow-xl border border-pink-500/20 flex flex-col">
+                    <div class="relative h-80 overflow-hidden cursor-pointer" onclick="openLightbox('img1.jpg', 'الصورة الأولى: ضحكتك اللي بتخطف قلبي كل ما بشوفها ❤️')">
+                        <img src="img1.jpg" alt="ملوكتي 1" onerror="this.src='https://placehold.co/600x800/ffb6c1/ffffff?text=Malokti+1'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs text-pink-300 font-bold border border-pink-500/30">
+                            صورة #1 👑
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">ابتسامتك اللي بتنور دنيتي</h3>
+                            <p class="text-pink-200/80 text-sm leading-relaxed">
+                                من أول ما عرفتك وأنا عرفت يعني ايه فرحة بجد. ضحكتك دي عندي بالدنيا وما فيها يا ملوكتي.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-pink-500/20 flex items-center justify-between text-xs text-pink-300">
+                            <span><i class="fa-solid fa-heart text-deepPink ml-1"></i> حب لا ينتهي</span>
+                            <button onclick="openLightbox('img1.jpg', 'الصورة الأولى: ضحكتك اللي بتخطف قلبي كل ما بشوفها ❤️')" class="text-white bg-deepPink/40 hover:bg-deepPink px-3 py-1.5 rounded-xl transition-all">تكبير الصورة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo 2 -->
+                <div class="glass-card rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-500 shadow-xl border border-pink-500/20 flex flex-col">
+                    <div class="relative h-80 overflow-hidden cursor-pointer" onclick="openLightbox('img2.jpg', 'الصورة الثانية: عيونك الساحرة اللي تهت فيها ومش عايز أخرج أبداً 🌸')">
+                        <img src="img2.jpg" alt="ملوكتي 2" onerror="this.src='https://placehold.co/600x800/ffc0cb/ffffff?text=Malokti+2'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs text-pink-300 font-bold border border-pink-500/30">
+                            صورة #2 💖
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">سحر عيونك وجمالك</h3>
+                            <p class="text-pink-200/80 text-sm leading-relaxed">
+                                نظرة عينيكي لوحدها حكاية تانية.. بحس إني ملكت الدنيا كلها أول ما بتصلي لي بنظرة من عيونك الحلوة.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-pink-500/20 flex items-center justify-between text-xs text-pink-300">
+                            <span><i class="fa-solid fa-heart text-deepPink ml-1"></i> غرام وعشق</span>
+                            <button onclick="openLightbox('img2.jpg', 'الصورة الثانية: عيونك الساحرة اللي تهت فيها ومش عايز أخرج أبداً 🌸')" class="text-white bg-deepPink/40 hover:bg-deepPink px-3 py-1.5 rounded-xl transition-all">تكبير الصورة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo 3 -->
+                <div class="glass-card rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-500 shadow-xl border border-pink-500/20 flex flex-col">
+                    <div class="relative h-80 overflow-hidden cursor-pointer" onclick="openLightbox('img3.jpg', 'الصورة الثالثة: ملوكتي القمر اللي منورة حياتي في كل لحظة ✨')">
+                        <img src="img3.jpg" alt="ملوكتي 3" onerror="this.src='https://placehold.co/600x800/ffb6c1/ffffff?text=Malokti+3'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs text-pink-300 font-bold border border-pink-500/30">
+                            صورة #3 🌟
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">القمر اللي بيحرس ليلي</h3>
+                            <p class="text-pink-200/80 text-sm leading-relaxed">
+                                مهما لفت الدنيا وشوفت ناس، هتفضلي إنتي القمر الحقيقي اللي منور حياتي وبيخليني أحب بكرة أكتر من امبارح.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-pink-500/20 flex items-center justify-between text-xs text-pink-300">
+                            <span><i class="fa-solid fa-heart text-deepPink ml-1"></i> روح قلبي</span>
+                            <button onclick="openLightbox('img3.jpg', 'الصورة الثالثة: ملوكتي القمر اللي منورة حياتي في كل لحظة ✨')" class="text-white bg-deepPink/40 hover:bg-deepPink px-3 py-1.5 rounded-xl transition-all">تكبير الصورة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo 4 -->
+                <div class="glass-card rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-500 shadow-xl border border-pink-500/20 flex flex-col lg:translate-x-1/2">
+                    <div class="relative h-80 overflow-hidden cursor-pointer" onclick="openLightbox('img4.jpg', 'الصورة الرابعة: الرقة والجمال كله مجتمعين فيكي يا ملكة قلبي 💐')">
+                        <img src="img4.jpg" alt="ملوكتي 4" onerror="this.src='https://placehold.co/600x800/ffc0cb/ffffff?text=Malokti+4'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs text-pink-300 font-bold border border-pink-500/30">
+                            صورة #4 💝
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">الرقة والأنوثة كلها</h3>
+                            <p class="text-pink-200/80 text-sm leading-relaxed">
+                                صوتك، كلامك، وكل تفصيلة فيكي بتخليني أقع في حبك مليون مرة كل يوم من غير ما أمل أبداً يا ملوكتي.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-pink-500/20 flex items-center justify-between text-xs text-pink-300">
+                            <span><i class="fa-solid fa-heart text-deepPink ml-1"></i> توأم روحي</span>
+                            <button onclick="openLightbox('img4.jpg', 'الصورة الرابعة: الرقة والجمال كله مجتمعين فيكي يا ملكة قلبي 💐')" class="text-white bg-deepPink/40 hover:bg-deepPink px-3 py-1.5 rounded-xl transition-all">تكبير الصورة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo 5 -->
+                <div class="glass-card rounded-3xl overflow-hidden group hover:scale-[1.02] transition-all duration-500 shadow-xl border border-pink-500/20 flex flex-col lg:translate-x-1/2">
+                    <div class="relative h-80 overflow-hidden cursor-pointer" onclick="openLightbox('img5.jpg', 'الصورة الخامسة: المستقبل الحلو كله معاكي وإنتي مراتي وملكة بيتي 💍')">
+                        <img src="img5.jpg" alt="ملوكتي 5" onerror="this.src='https://placehold.co/600x800/ffb6c1/ffffff?text=Malokti+5'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs text-pink-300 font-bold border border-pink-500/30">
+                            صورة #5 👑
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">مستقبلنا وحياتنا مع بعض</h3>
+                            <p class="text-pink-200/80 text-sm leading-relaxed">
+                                بدعي ربنا كل ليلة إننا نبقى مع بعض طول العمر، وإني أفضل أشوف الضحكة دي على وشك لحد ما نبقى عاجزين سوا يا ملكة عمري.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-pink-500/20 flex items-center justify-between text-xs text-pink-300">
+                            <span><i class="fa-solid fa-heart text-deepPink ml-1"></i> شريكة عمري</span>
+                            <button onclick="openLightbox('img5.jpg', 'الصورة الخامسة: المستقبل الحلو كله معاكي وإنتي مراتي وملكة بيتي 💍')" class="text-white bg-deepPink/40 hover:bg-deepPink px-3 py-1.5 rounded-xl transition-all">تكبير الصورة</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- INTERACTIVE LOVE MINI-GAME ("بتحبيني ولا لا؟") -->
+        <section id="minigame" class="py-20 px-4 max-w-4xl mx-auto w-full relative z-10">
+            <div class="glass-card p-8 md:p-12 rounded-3xl text-center relative overflow-hidden border border-pink-500/30 shadow-2xl">
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-deepPink/20 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+                <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-tr from-romanticRed to-deepPink rounded-full flex items-center justify-center shadow-lg shadow-deepPink/50 animate-heartbeat">
+                    <i class="fa-solid fa-face-kiss-wink-heart text-3xl text-white"></i>
+                </div>
+
+                <h2 class="text-3xl md:text-4xl font-black text-white mb-4">
+                    اختبار حب صريح لملوكتي 🥰
+                </h2>
+                <p id="gameQuestion" class="text-lg md:text-xl text-pink-200/90 mb-10 font-medium">
+                    بتحبيني قد إيه يا ملك؟ صراحة بقى من غير كسوف! 🤭
+                </p>
+
+                <div id="gameButtonsContainer" class="flex flex-col sm:flex-row items-center justify-center gap-6 relative min-h-[100px]">
+                    <button onclick="acceptLove()" class="px-10 py-5 rounded-2xl bg-gradient-to-r from-deepPink to-romanticRed text-white font-black text-xl shadow-xl shadow-deepPink/50 hover:scale-110 active:scale-95 transition-all flex items-center gap-3 z-20">
+                        <i class="fa-solid fa-heart text-2xl"></i>
+                        <span>أيوة بحبك موت ❤️</span>
+                    </button>
+
+                    <button id="noBtn" onmouseover="moveNoButton()" onclick="moveNoButton()" class="px-8 py-4 rounded-2xl bg-white/10 border border-pink-400/40 text-pink-300 font-bold text-lg hover:bg-white/20 transition-all z-20 absolute sm:relative">
+                        لا 😢
+                    </button>
+                </div>
+
+                <div id="gameResponse" class="mt-8 text-xl font-bold text-pink-300 min-h-[40px] transition-all"></div>
+            </div>
+        </section>
+
+        <!-- DAILY LOVE NOTES / SURPRISE GENERATOR -->
+        <section class="py-16 px-4 max-w-4xl mx-auto w-full relative z-10 text-center">
+            <div class="glass-card p-8 md:p-10 rounded-3xl border border-pink-500/30">
+                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">رسالة حب خاصة من قلبي لكي 💌</h3>
+                <p class="text-pink-200/80 mb-6 text-sm md:text-base">كل ما تحتاجي تحسي بحبي ليكي، اضغطي هنا وشوفي كلام طالع من قلبي عليكي:</p>
+                
+                <div id="loveQuoteBox" class="p-6 rounded-2xl bg-white/5 border border-pink-500/20 text-pink-100 text-lg md:text-xl font-semibold mb-6 italic min-h-[90px] flex items-center justify-center">
+                    "يا ملوكتي، إنتي مش بس حبيبتي، إنتي بنتي وأختي وصحبتي وكل دنيتي اللي بفتخر بيها قدام الكل."
+                </div>
+
+                <button onclick="generateNewQuote()" class="px-6 py-3 rounded-xl bg-deepPink/30 hover:bg-deepPink/60 text-white font-bold border border-pink-500/40 transition-all flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>طلعي رسالة كمان ✨</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="py-12 text-center text-pink-300/70 border-t border-pink-500/20 relative z-10 mt-auto">
+            <div class="max-w-xl mx-auto px-4">
+                <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-deepPink/20 flex items-center justify-center text-deepPink">
+                    <i class="fa-solid fa-infinity"></i>
+                </div>
+                <p class="text-lg font-bold text-white mb-2">مُصمم بحب خصيصاً لملوكتي ❤️</p>
+                <p class="text-sm">ربنا ما يحرمني منك أبداً ويخليكي ليا لحد آخر العمر يا ملكة قلبي.</p>
+                <p class="text-xs text-pink-400/50 mt-6">© 2026 حكاية عشق لا تنتهي</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="lightboxModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="closeLightbox()">
+        <div class="relative max-w-4xl w-full flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute -top-12 left-0 text-white hover:text-deepPink text-3xl transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="lightboxImg" src="" alt="Zoomed Photo" class="max-h-[75vh] max-w-full rounded-2xl shadow-2xl border border-pink-500/40 object-contain mb-4">
+            <p id="lightboxCaption" class="text-white text-center text-lg font-semibold bg-black/50 px-6 py-3 rounded-2xl border border-pink-500/30 backdrop-blur-md"></p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Password verification logic
+        function checkPassword() {
+            const inputVal = document.getElementById('passwordInput').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const passwordModal = document.getElementById('passwordModal');
+            const mainApp = document.getElementById('mainApp');
+            const bgMusic = document.getElementById('bgMusic');
+
+            // Expected password: 5/10/2026
+            if (inputVal === '5/10/2026') {
+                errorMsg.textContent = '';
+                passwordModal.classList.add('opacity-0', 'pointer-events-none');
+                
+                setTimeout(() => {
+                    passwordModal.style.display = 'none';
+                    mainApp.classList.remove('opacity-0', 'pointer-events-none');
+                    
+                    // Play background music
+                    bgMusic.play().catch(e => {
+                        console.log("Audio autoplay restricted, waiting for user interaction.");
+                    });
+
+                    // Trigger welcome confetti
+                    triggerConfetti();
+                }, 700);
+            } else {
+                errorMsg.textContent = 'لا يا ملوكتي مش هو ده التاريخ، افتكري كويس! 🥺';
+                errorMsg.classList.remove('opacity-0');
+                
+                const modalBox = passwordModal.querySelector('.glass-modal');
+                modalBox.classList.add('animate-shake');
+                setTimeout(() => {
+                    modalBox.classList.remove('animate-shake');
+                }, 400);
+            }
+        }
+
+        // Allow Enter key for password
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Music toggle controller
+        let isPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicIcon = document.getElementById('musicIcon');
+
+        // Update play state when music starts
+        bgMusic.onplay = () => { isPlaying = true; musicIcon.classList.add('fa-spin'); };
+        bgMusic.onpause = () => { isPlaying = false; musicIcon.classList.remove('fa-spin'); };
+
+        function toggleMusic() {
+            if (isPlaying) {
+                bgMusic.pause();
+            } else {
+                bgMusic.play().catch(e => alert("عذراً، مشغل الموسيقى محتاج تفاعل."));
+            }
+        }
+
+        // Floating Hearts Generator
+        function createFloatingHeart() {
+            const container = document.getElementById('hearts-container');
+            if (!container) return;
+
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            
+            const icons = ['fa-heart', 'fa-solid fa-heart', 'fa-solid fa-sparkles', 'fa-solid fa-star'];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+            
+            heart.innerHTML = `<i class="${randomIcon}"></i>`;
+            
+            const startX = Math.random() * window.innerWidth;
+            const size = Math.random() * 20 + 10;
+            const duration = Math.random() * 6 + 4;
+            
+            heart.style.left = startX + 'px';
+            heart.style.fontSize = size + 'px';
+            heart.style.animationDuration = duration + 's';
+            
+            container.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        setInterval(createFloatingHeart, 400);
+
+        // Love Mini-Game "لا" button running away
+        const funnyPhrases = [
+            "بتهربي رايحة فين؟ دنا ماصدقت! 🤭",
+            "مافيش مفر، اعترفي يلا بحبي! ❤️",
+            "زرار 'لا' ده خسران خسران يا ملوكتي! 😂",
+            "حاولي تاني.. قلبك بيقول أيوة أساساً! 🥰",
+            "عيب يا ملك، دنا حبيبك برضه! 🌸",
+            "مستحيل أديكي فرصة تدوسي هنا! 🏃‍♂️"
+        ];
+
+        function moveNoButton() {
+            const btn = document.getElementById('noBtn');
+            const responseDiv = document.getElementById('gameResponse');
+            
+            const randomPhrase = funnyPhrases[Math.floor(Math.random() * funnyPhrases.length)];
+            responseDiv.textContent = randomPhrase;
+            responseDiv.className = "mt-8 text-xl font-bold text-pink-300 animate-pulse";
+
+            const maxX = window.innerWidth > 768 ? 300 : 120;
+            const maxY = 120;
+            
+            const randomX = (Math.random() - 0.5) * maxX;
+            const randomY = (Math.random() - 0.5) * maxY;
+            
+            btn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        }
+
+        function acceptLove() {
+            const responseDiv = document.getElementById('gameResponse');
+            responseDiv.textContent = "عارف والله! دنا بموت فيكي وبحبك قد الدنيا كلها يا روح قلبي وعمري كله ❤️💍✨";
+            responseDiv.className = "mt-8 text-2xl font-black text-white bg-deepPink/30 p-6 rounded-2xl border border-pink-500/40 shadow-lg";
+            
+            triggerConfetti();
+        }
+
+        // Confetti trigger helper
+        function triggerConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 90,
+                origin: { y: 0.6 },
+                colors: ['#ff4d6d', '#ffb6c1', '#ffffff', '#c9184a']
+            });
+        }
+
+        // Love Quotes Generator
+        const loveQuotes = [
+            "يا ملوكتي، إنتي أماني وفرحتي وكل حاجة حلوة في دنيتي.",
+            "لو لفيت الكون كله مش هييجي في حلاوتك ولا طيبة قلبك يا ملكة روحي.",
+            "وجودك جمبي بيخليني أحس إني أقوى راجل في الدنيا.",
+            "بحبك بكل تفاصيلك، بضحكتك، بعيونك، وبكل كلمة بتقوليها.",
+            "إنتي مش بس حبيبتي، إنتي البنت اللي اخترتها تكون أم أولادي ومراتي وكل دنيتي.",
+            "كل ثانية بتعدي وأنا معاكي بتسوى عمري كله بحاله يا روح قلبي."
+        ];
+
+        function generateNewQuote() {
+            const quoteBox = document.getElementById('loveQuoteBox');
+            const randomQuote = loveQuotes[Math.floor(Math.random() * loveQuotes.length)];
+            
+            quoteBox.style.opacity = 0;
+            setTimeout(() => {
+                quoteBox.textContent = `"${randomQuote}"`;
+                quoteBox.style.opacity = 1;
+            }, 200);
+        }
+
+        // Lightbox Functions
+        function openLightbox(imgSrc, captionText) {
+            const modal = document.getElementById('lightboxModal');
+            const img = document.getElementById('lightboxImg');
+            const caption = document.getElementById('lightboxCaption');
+            
+            img.src = imgSrc;
+            caption.textContent = captionText;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightboxModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
+```
